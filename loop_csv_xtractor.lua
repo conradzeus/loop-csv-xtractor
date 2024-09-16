@@ -24,7 +24,6 @@
 -- 
 -- //conrad 
 
-
 local kt = Kontakt
 
 INSTRUMENT_IDX = 0 -- Assuming you only have one NKI loaded and it is the first you loaded
@@ -72,8 +71,30 @@ local function sortFilesByNumber(files)
     end)
 end
 
+-- Function to get desktop path based on the operating system
+local function getDesktopPath()
+    local home = os.getenv("HOME")
+    if home then
+        -- Assume the desktop path based on OS
+        local osName = os.getenv("OS") or ""
+        if osName:find("Windows") then
+            -- For Windows, use the 'USERPROFILE' environment variable
+            return os.getenv("USERPROFILE") .. "\\Desktop\\loop_data.csv"
+        else
+            -- For macOS and Linux, 'HOME' should be sufficient
+            return home .. "/Desktop/loop_data.csv"
+        end
+    else
+        -- Fallback to current directory if HOME is not found
+        return "loop_data.csv"
+    end
+end
+
+-- Get the path to save the file
+local output_file_path = getDesktopPath()
+
 -- Open file for writing
-local output_file = io.open("loop_data.csv", "w")
+local output_file = io.open(output_file_path, "w")
 
 if output_file then
     -- Write CSV header without Loop Length
@@ -105,7 +126,7 @@ if output_file then
     end
 
     output_file:close()
-    print("Loop data successfully written to loop_data.csv, organized by group index and file number.")
+    print("Loop data successfully written to " .. output_file_path)
 else
     print("Error opening file for writing")
 end
